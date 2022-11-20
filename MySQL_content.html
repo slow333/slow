@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MySQL</title>
+  <script src="fixhead.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<body>
+<div id="nav-placeholder"> </div>
+<script>
+  $(function(){
+    $("#nav-placeholder").load("nav.html");
+  });
+</script>
+<script> fixheader() </script>
+
+<h1 style="padding-top: 130px;padding-left: 40px">MySQL //
+  <a href="https://mariadb.com/kb/en/introduction-to-relational-databases/" style="font-size: 0.6em">소개(mariadb) ||</a>
+  <a href="https://mariadb.com/kb/en/sql-statements/" style="font-size: 0.6em">mariadb sql || &nbsp;</a>
+  <a href="https://dev.mysql.com/doc/refman/8.0/en/" style="font-size: 0.6em"> mysql sql</a>
+</h1>
+<div class="container">
+  <div class="box">
+<h2  style="padding-top: 6px">MySQL의 정의</h2>
+<p>
+  MariaDB는 오픈 소스의 관계형 데이터베이스 관리 시스템(RDBMS)이다. MySQL과 동일한 소스 코드를 기반으로 하며,
+  GPL v2 라이선스를 따른다. 오라클 소유의 현재 불확실한 MySQL의 라이선스 상태에 반발하여 만들어졌으며,
+  배포자는 몬티 프로그램 AB(Monty Program AB)와 저작권을 공유해야 한다.
+  이것은 MySQL과 높은 호환성을 유지하기 위함이며, MySQL API와 명령에 정확히 매칭하여,
+  라이브러리 바이너리와 상응함을 제공하여 교체 가능성을 높이고자 함이다.
+  마리아 DB에는 새로운 저장 엔진인 아리아(Aria)뿐만 아니라, InnoDB를 교체할 수 있는
+  XtraDB 저장 엔진을 포함하고 있다.
+  이것은 트랜잭션과 비트랜잭션 엔진 그리고 미래에 나올 MySQL 판에 대응하고자 함일 것이다.
+  마리아 DB의 주요 개발자는 MySQL과 몬티 프로그램 AB를 설립한
+  몬티 와이드니어스(Michael Monty Widenius)이다. 그는 이전에 자신의 회사,
+  MySQL AB를 썬 마이크로시스템즈에 10억 달러에 판매를 한 적이 있으며, 마리아 DB는
+  그의 둘째 딸인 마리아의 이름을 딴 것이다.
+</p>
+
+<h2>Account Management SQL Commands</h2>
+<h3>  CREATE/DROP USER, GRANT, REVOKE, SET PASSWORD etc. </h3>
+<p>  기본은 CRUD : Create, Read, Update, Delete </p>
+<h2>mysql 사용자 계정 추가</h2>
+<pre>
+  ㅇ LOGIN :   mysql -u root -p
+  ㅇ 사용자 계정 확인
+    use mysql;  // mysql database 선택
+    select host, user, password form user; //user table 보기
+  ㅇ 사용자 추가(권한추가)
+    mysql > create user 사용자ID;   // 사용자 추가
+    mysql > create user userid@localhost identified by '비밀번호';
+  ㅇ 기존에 사용하던 계정에 외부 접근 권한을 부여하려면, Host를 '%' 로 하여 똑같은 계정을 추가한다
+    mysql > create user 'userid'@'%' identified by '비밀번호';  // '%' 의 의미는 외부에서의 접근을 허용
+
+  [ 다른 방법으로는 ]
+    mysql > USE mysql;     // mysql database 선택
+    mysql > INSERT INTO user (Host, User, Password) VALUES ('localhost', '계정아이디', password('비밀번호'));
+    mysql > INSERT INTO user (Host, User, Password) VALUES ('%', '계정아이디', password('비밀번호'));
+    mysql > FLUSH privileges;
+
+  ㅇ 사용자 삭제
+    mysql > drop user '사용자ID'@localhost;    // 사용자 삭제
+    mysql > select * from user;    // 등록된 모든 사용자 ID 조회
+    mysql > delete from user where user = '사용자ID';      // 사용자 삭제
+</pre>
+<h2>계정이 접근할 수 있는 데이터베이스를 생성</h2>
+<pre>
+  mysql > show databases;     // DB 목록 확인
+  msyql > create database DB명;    // 데이터베이스 생성
+  msyql > create schema DB명 default character set utf8; -- 둘중에 하나를 입력하면 DB 생성됨
+  mysql > create database DB명 default character set utf8;
+      // default character set을 지정하지 않으면 한글이 깨져서 나오므로 주의해야 한다.
+  msyql > drop database DB명;       // 데이터베이스 삭제
+  create table slow33.country world.Country; // 다른 db에서 테이블 복사해 오기
+</pre>
+<h2>사용자에게 데이터베이스 사용권한 부여</h2>
+<pre>
+  - MySQL은 사용자 이름, 비밀번호, 접속 호스트로 여러분을 인증한다.
+  - MySQL은 로그인을 시도하는 위치가 어디인가 하는 것도 인증의 일부로 간주한다.
+  - MySQL에서 사용자 계정을 추가하고 권한을 추가하거나 제거하는 데 GRANT 와
+    REVOKE 명령을 사용하기를 권장한다.
+  - 사용자에게 허가된 것을 확인하려면 SHOW GRANTS 를 사용한다.
+  - IDENTIFIED BY '비밀번호'; 는 권한부여를 하면서 비밀번호까지 변경하고자 하는 경우
+    이므로 비밀번호는 변경하지 않으려면 이 부분을 빼면 된다.
+    mysql > GRANT ALL PRIVILEGES ON DB명.테이블 TO 계정아이디@host IDENTIFIED BY '비밀번호';
+      // 계정이 이미 존재 하는데 'identified by '비밀번호' 부분을 추가하면 비밀번호가 변경된다
+    mysql> GRANT ALL privileges ON DB명.* TO 계정아이디@locahost IDENTIFIED BY '비밀번호';
+    mysql> GRANT ALL privileges ON DB명.* TO 계정아이디@'%' IDENTIFIED BY '비밀번호';
+  mysql > grant all privileges on DB명.* to userid@'%' identified by '비밀번호' ;
+   //모든 원격지에서 접속 권한 추가
+  host에 '200.100.%' 로 하면 IP주소가 200.100.X.X 로 시작되는 모든 IP에서 원격 접속을 허용한다는 의미
+  host에 '200.100.100.50' 으로 하면 IP주소가 200.100.100.50 인 곳에서만 원격 접속을 허용한다는 의미
+  mysql > grant all privileges on test.* to userid@localhost identified by '비밀번호';
+    // user 에게 test 데이터베이스 모든 테이블에 대한 권한 부여
+  mysql> grant select, insert, update on test.* to user@localhost identified by '비밀번호';
+    // user 에게 test 데이터베이스 모든 테이블에 select, insert, update 권한 부여
+  mysql> grant select, insert, update on test.* to user@localhost;
+    -- 패스워드는 변경없이 권한만 부여하는 경우
+    // user 에게 test 데이터베이스 모든 테이블에 select, insert, update 권한 부여
+  mysql> grant all privileges on *.* to user@localhost identified by '비밀번호' with grant option;
+    // user 에게 모든 데이터베이스 모든 테이블에 권한 부여
+    // 전역 권한은 모두 광범위한 보안문제가 수반되므로 권한을 허용하는 경우 신중해야 함
+  mysql > flush privileges;     // 변경된 내용을 메모리에 반영(권한 적용)
+ㅇ 사용자에게 부여된 권한 확인
+  mysql > SHOW GRANTS FOR test@localhost;  -- userid 와 host명까지 붙여서 검색해야 함
+  mysql > SHOW GRANTS FOR test@'%';
+  mysql > SHOW GRANTS FOR test@'200.100.100.50';
+</pre>
+<h2>사용자에게 데이터베이스 사용권한 제거</h2>
+<pre>
+  mysql >  revoke all on DB명.테이블명 from 사용자ID;     // 모든 권한을 삭제
+    이제 다시 show grants 로 정보를 확인해보면
+    user 정보는 남아 있는데, 권한부여 정보는 삭제되고 없는 것이 보인다.
+    사용자 계정마저 삭제하고 권한 설정 정보를 확인하려고 하면 Error 가 발생하는 걸 확인할 수 있다.
+  ㅇ 사용자 계정 삭제
+    mysql > drop user userid@'%';
+    mysql > drop user userid@localhost;
+      위에 있는 것과 비교해서 host 가 % 로 된 것이 삭제되었다.
+  ㅇ 비밀번호 보안
+    MySQL 비밀번호가 일반 텍스트로 저장되지 않는다고 해서 비밀번호를 간단하게 만들어서는 안된다.
+    MySQL 서버에 접속 가능한 사람은 누구든지 무차별 대입공격(brute-force) 방식으로 비밀번호를
+    알아내려고 시도해 볼 수 있으며, MySQL 은 유닉스 비밀번호에서처럼 이런 공격을 감지하고
+    막아낼 방도가 없다.
+</pre>
+
+  <h3>테이블 생성 : 스키마는 데이터의 설계도</h3>
+<pre>
+  데이터베이스에 데이터를 아무렇게 넣는것이 아닌 테이블에 어떠한 형식으로
+  데이터들이 삽입되고 저장될것인지를 미리 사전에 설계해야됩니다
+
+  member_table - 테이블명
+  =============================
+  seq   /  회원ID  / 회원 암호 / 주소 / 전화번호
+  =============================
+  CREATE TABLE member_table (  //테이블 생성 부분입니다
+  seq        INT NOT NULL AUTO_INCREMENT, //seq 컬럼 : 자동인덱스 증가,
+  //데이터 타입은 INT NOT NULL 로 중복이 불가능한 숫자형
+  mb_id     VARCHAR(20),  // 용도 : 회원ID, 데이터 타입은 VARCHAR(20)으로 지정
+  mb_pw    VARCHAR(20),   // 용도 : 패스워드, 데이터 타입은 VARCHAR(20)으로 지정
+  address   VARCHAR(100),  //용도 : 주소
+  mb_tell    VARCHAR(50),  //용도 : 연락처
+  created DATETIME NOT NULL, // 날짜를 생성(아래 참조)
+  PRIMARY KEY(seq)          //seq -seq 를 기본키로 지정하여 중복이 불가능하게 지정
+  ) ENGINE=MYISAM CHARSET=utf8;
+    //ENGINE 은 MYISAM으로 지정하였고, CHARSET 은 utf-8로 지정하여 가변폭 방식의 인코딩
+
+  MySQL 테이블 스토리지 엔진 확인
+  SELECT engine FROM information_schema.TABLES where table_name='테이블명' AND table_schema='디비명';
+
+  alter table을 선언하고 필요한 옵션을 바꿉니다.
+  맨 마지막에 not null을 추가로 입력해주면 완료입니다.
+  alter table member_table modify column name varchar(50) not null
+  반대로 다시 null을 허용하고 싶다면? 이런 식으로 not null을 지워서 기본 옵션으로 돌아가면 됩니다.
+  alter table member_table modify column name varchar(50)
+</pre>
+  <H3>  MySQL - 데이터 타입(Data Type) - 자료형 </H3>
+<P>
+  데이터베이스의 테이블 컬럼들을 정의할때 컬럼이 어떠한 형식을 가지고 있고,
+  어떠한 제약을 가지고 있어야 되는것이 데이터 타입(Data Type) 입니다.
+  데이터 자료형은 크게 문자형, 숫자형, 날짜형, 선택형으로 나누어 집니다</P>
+<p>  1. 문자형 타입 : 보편적으로 많이 쓰이는것은 CHAR(), VARCHAR(), TEXT 입니다  </P>
+  <pre>
+    데이터 타입   범위
+  CHAR()      0 ~ 255 고정문자 길이
+  VARCHAR()   0 ~ 65535 가변 문자 길이
+  INNYTEXT    0 ~ 255 문자길이
+  TEXT        0 ~ 65535 문자길이
+  BLOB        0 ~ 65535 문자길이
+  MEDIUMTEXT  0 ~ 16777215 문자길이
+  MEDIUMBLOB  0 ~ 16777215 문자길이
+  LONGTEXT    0 ~ 4294967295 문자길이
+  LONGBLOB    0 ~ 4294967295 문자길이
+
+  용도 :
+  CHAR - 전화번호 같이 정형화 되어 있는것으로 사용됩니다
+  VARCHAR - 게시판 제목 같이 가변적일때 사용됩니다
+  TEXT - 게시판의 내용 같이 내용이 많을때 사용됩니다
+
+  CHAR() - 고정 문자일때 사용됩니다
+  - char(10)을 지정하면 10개(10Byte)의  데이터를 입력할 수 있습니다.
+  - (char(10) 지정후 데이터를 5Byte를 입력해도 데이터 공간은 10Byte로
+  자료형 크기만큼 데이터 공간을 차지하게 됩니다)
+  VARCHAR() - 가변 문자일대 사용됩니다
+  - VARCHAR(10)을 지정하면 10개(10Byte)의  데이터를 입력할 수 있습니다.
+  - (varchar(10) 지정후 데이터를 5Byte를 입력시 데이터 공간은 5Byte로
+  데이터 크기만큼 차지하게 됩니다)
+  CHAR(), VARCHAR() 차이점
+  - char은 검색이나 성능이 뛰어나 정형화 일때 사용되며, varchar는 가변적일때 사용됩니다.
+  TEXT
+  - text는 자연어 검색이 가능하게 하는것으로 용량이 많이 사용하게 될때 사용됩니다.
+  </pre>
+  <p>숫자형 타입</p>
+  <pre>
+  데이터 타입    	크기최    최소값    					최대값
+  INT        	4Byte	-2147483648 ~ 2147483647	0 ~ 4294967295
+  TINYNT		 	1Byte	-128 ~ 127					0 ~ 255 정수형, UNSIGNED
+  FLOAT			  4Byte	-3.402823466×1038 ~ 3.402823466×1038
+  DOUBLE			8Byte 	-1.7976931348623157×10308 ~ 1.7976931348623157×10308
+
+  숫자형은 사용할수 있는 범위가 정해져 잇으며, 부호가 있고 없고에 따라서 범위가
+  틀려지게되니 범위에 맞게 사용하셔야 합니다.
+  </pre>
+  <p> 날짜형 타입</p>
+  <pre>
+  데이터 타입	크기		  최소값
+  DATE	  	3Byte 	YYYY-MM-DD
+  DATETIME	8Byte 	YYYY-MM-DD HH:MM:SS
+  TIMESTAMP	4Byte 	YYYYMMDDHHMMSS
+  TIME	  	3Byte 	HH:MM:SS
+
+  표기방법	  	출력결과
+  년도		      Y(4자리)		2017, 2018, 2019, ...
+              y(2자리)		17, 18, 19, ...
+  월    M     Janeary, February, March, ...
+        c     1, 2, 3, ...
+        b     Jan, Feb, Mar, ...
+  요일   W	    Sunday, Monday, ...
+        a     Sun, Tue, ...
+  시    H     19, 20, 21, ...
+        h	    07, 08, 09, ...
+  초    s     51, 52, 53, ...
+
+  날짜형은 Y(년도), M(월), D(일), S(초) 로 포멧형식에 따라 표기방식이 달라집니다.
+
+  DATE - 날짜정보
+  포멧형식 : YYYY-MM-DD
+  ex) : 2019-09-01
+  -  년, 월 일 형태로 표현할때 사용됩니다.
+
+  DATETIME    - 날짜/시간 정보
+  포멧형식 : YYYY-MM-DD
+  ex) : 2019-09-01 20:30:59
+  -  년, 월, 일, 시, 분 형태로 표현할때 사용됩니다.
+
+  TIMESTAMP    - 날짜/시간 정보
+  포멧형식 : YYYY-MM-DD
+  ex) : 2019-09-01- 20:30:59
+  - 실행 조건의 따라 다양하게 사용할수 있으며,
+  변경시 자동으로 날짜와 시간이 변경되는 설정도 가능합니다.
+  TIME    - 시간 정보
+  포멧형식 : HH:MM:SS
+  ex) : 20:30:59
+  -  시, 분, 초 형태로 표현할때 사용합니다.
+</pre>
+
+  <h3>Storage Engine(MyISAM vs InnoDB)</h3>
+  <p>먼저 MySQL에는 크게 두 가지의 엔진이 존재한다. 하나는 서버 엔진이고 하나는 스토리지 엔진이다.
+  서버 엔진은 쿼리 요청이 왔을 때 쿼리 파싱(Query parsing)을 하여 스토리지 엔진에 데이터를 요청하는 작업을 한다.
+  스토리지 엔진은 물리적 저장장치에서 데이터를 읽어오는 작업을 한다.
+  여기서 스토리지 엔진을 중점적으로 알아보려고 한다. 스토리지 엔진이 중요한 이유는 첫째로, 트렌젝션 처리와 밀접한 관련이 있다는 것이고, 둘째로 엔진마다 동작 원리가 달라서 상황에 따라 천차만별의 성능을 보이기 때문이다.
+  MySQL에서 사용가능한 엔진은 여럿 존재한다. 이 글에서 중점적으로 다룰 대표적인 엔진 MyISAM과 InnoDB가 있고, 이 외에도 Archive, Memory, Merge, Cluster, BDB, Custom의 엔진까지 총 8가지가 존재한다. 이 다양한 엔진들 중에서 가장 대중적으로 사용되는 두 엔진을 알아보도록 하자.
+  </p>
+  <p>MyISAM :   기존의 ISAM(Indexed Sequential Access Method) 엔진을 보완하여 나온 엔진이다.</p>
+<p>
+  장점<br>
+  엔진 자체가 아주 기본적인 기능만 제공하여 상당히 가볍다.<br>
+  검색(SELECT)작업이 상당히 빠르다.<br>
+  검색하고자 하는 내용에 대한 복합검색이 가능하다.<br>
+
+  단점<br>
+  트랜잭션 세이프하지 않다. 따라서 트랜젝션을 처리하고자 한다면, 프로그래머가 코드레벨에서 처리해 주어야 한다.<br>
+  쓰기 작업시 Table level locking이 걸리기 때문에 상당히 속도가 느리다.<br>
+  데이터 무결성에 대한 보장이 되지 않는다. 따라서 이 또한 개발자가 무결성 조건을 만족하도록 코드를 작성해 주어야 한다.<br>
+  또한 외래키의 생성이 불가능하다.<br>
+
+  InnoDB<br>
+  현재 MySQL의 기본 스토리지 엔진이다. MyISAM에 비해서 상당히 많은 기능을 제공한다.<br>
+
+  장점<br>
+  데이터 무결성을 보장해준다. 따라서 프로그래머가 신경 써주지 않아도 된다.<br>
+  Row level locking으로 MyISAM보다 동시성에서 우위를 보인다. 따라서 데이터 수정 작업(UPDATE, INSERT, DELETE)에 유리하다.<br>
+  트랜젝션을 지원하여, 개발자가 트랜젝션을 코드레벨에서 설정하는 부담이 적다. Commit과 Rollback을 지원하는 것이다.<br>
+  장애복구, 외래키 지원 등 다양한 기능을 제공한다.<br>
+
+  단점<br>
+  많은 기능을 제공하다 보니 상당히 엔진이 무거워서 작업속도가 상대적으로 느리다.<br>
+  시스템 자원을 많이 사용한다.<br>
+
+  사용 범위<br>
+  위의 두 엔진들을 보면 완전히 반대 성향을 띄고 있다. 비유를하자면 MyISAM은 메모장과 같이 아주 기본적인 기능만을 제공하는 대신 상당히 가볍다는 장점이 있고, InnoDB는 이클립스와 같은 IDE같이 다양한 기능을 제공하는 대신 복잡도가 높고 무겁다는 단점이 있다.<br>
+  따라서 MyISAM의 경우는 SELECT와 같은 검색에 상당히 강력하다. 테이블 단위로 락킹이 걸리므로 동시에 여러가지 데이터 수정작업이 일어나는 테이블에 사용할 경우 상당히 성능의 저하될 우려가 크다. 따라서 정적인 데이터를 저장하고 자주 읽기 작업이 일어나는 테이블에 적합하다.<br>
+  그리고 InnoDB는 다양한 기능이 있는 만큼 중요한 데이터를 다루는 테이블에 적용시키면 상당히 유용하다. 중요 데이터를 다룰 때, 무결성이 보장되고, 트랜젝션 처리가 가능하고, 오류 복구 기능을 제공하는 InnoDB는 아주 적합하다고 할 수 있다. 또한 락킹의 단위가 행단위이기 때문에 읽고 쓰는 상황이 많은 경매 테이블에 적합하다.<br>
+
+  테이블 단위로 엔진을 다르게 적용할 수 있을까?<br>
+  스토리지 엔진은 동일 DB내의 테이블마다 다르게 지정이 가능하다. 따라서 자신이 사용하는 테이블의 특성에 따라서 엔진을 달리해주어 최적화된 DB를 생성하는 것이 바람직 하겠다.<br>
+</p>
+<pre>
+    MyISAM vs InnoDB
+
+  MyISAM       InnoDB
+  트랜젝션    미지원         지원
+  외래키      미지원        지원
+  모델 복잡도  단순         복잡
+  무결성      미지원        지원
+  시스템 자원 사용   적음    많음
+  복구        미지원            지원
+  lock     Table level locking    Row level locking
+</pre>
+<h3>사용 이용 방법</h3>
+<pre>
+  create table member_table(
+     seq INT NOT NULL AUTO_INCREMENT,
+     created DATETIME NOT NULL,
+     mb_id VARCHAR(20), mb_pw VARCHAR(20),
+     address VARCHAR(100),
+     mb_tell VARCHAR(50),
+     PRIMARY KEY(seq)
+     ) ENGINE=MYISAM CHARSET=utf8;
+  insert into member(
+     mb_id, mb_pw, address, mb_tell,created)
+     values("sss","1111","daejeon segu","203032",NOW());
+  *** 시간은 NOW()로 지정
+
+</pre>
+<h3> 외부에서 데이터 베이스 샘플 가져오기</h3>
+  <a href="https://dev.mysql.com/doc/index-other.html"> 여기에 있음...</a>
+  <p>가저와서 임포트 함</p>
+  <pre>
+  $> mysql -u root -p
+  mysql> SOURCE C:/temp/world.sql;
+  mysql> USE world;
+  mysql> SHOW TABLES;
+  mysql> SELECT COUNT(*) FROM city;
+  mysql> SELECT COUNT(*) FROM country;
+  </pre>
+
+  <h3>mariad db 10 한글 입력 깨짐 해결</h3>
+<pre>
+      show variables like 'c%';
+    +----------------------------------+-------------------------------------------------------+
+    | Variable_name                    | Value                                                 |
+    +----------------------------------+-------------------------------------------------------+
+    | character_set_client             | utf8                                                  |
+    | character_set_connection         | utf8                                                  |
+    | character_set_database           | utf8                                                  |
+    | character_set_filesystem         | binary                                                |
+      ........
+    | column_compression_zlib_wrap     | OFF                                                   |
+    | completion_type                  | NO_CHAIN                                              |
+    | concurrent_insert                | AUTO                                                  |
+    | connect_timeout                  | 10                                                    |
+    | core_file                        | ON                                                    |
+    +----------------------------------+-------------------------------------------------------+
+    DB에서 실행하면 한글이되기는 하는데 매번 해야함
+    set character_set_client = euckr;
+    set character_set_connection = euckr;
+    set character_set_results = euckr;
+</pre>
+  <p>my.ini(db설정 파일을 수정해야함,linux는 my.cnf) </p>
+  <pre>
+    # utf8 이나 utf8mb4로 설정하면 한글안됨
+    [client]
+    # 변경함
+    default-character-set=euckr
+
+    [mysqladmin]
+    user=root
+    port=3306
+
+    # The MySQL server
+    [mysqld]
+    # set basedir to your installation path
+    basedir="C:/Bitnami/wampstack-7.4.33-0/mariadb"
+    # set datadir to the location of your data directory
+    datadir="C:/Bitnami/wampstack-7.4.33-0/mariadb/data"
+    port=3306
+    max_allowed_packet=32M
+    bind-address=127.0.0.1
+    expire_logs_days=7
+    character-set-server=utf8mb4
+    #inserted new(변경함)
+    init-connect='SET NAMES euckr'
+    #
+    collation-server=utf8mb4_unicode_ci
+
+    # The default storage engine that will be used when create new tables when
+    default-storage-engine=INNODB
+
+    log-error="C:/Bitnami/wampstack-7.4.33-0/mariadb/data/mysqld.log"
+    [mysqldump]
+    max_allowed_packet=32M
+
+    [mysql]
+    port=3306
+    #inserted new(변경....)
+    default-character-set=euckr
+  </pre>
+  <h3>phpMyAdmin에서 excel 가져오기</h3>
+  <p> 우선 phpmyadmin에 로그인(127.0.0.1/phpmyadmin root 111111)</p>
+    <p>엑셀 파일 저장을 csv로 함(순서는 desc 테이블명 에서 보기는 순서대로 있어야함, 첫줄이 no(seq)면 빈 칸을 삽입)</p>
+    <p>db에서 테이블 선택 --> 가져오기 --> 파일선택 --> 일부부만 가져오기(1로함 첫 칸은 seq로 자동 생성), 형식특정 옵션(Update data when duplicate keys found on import (add ON DUPLICATE KEY UPDATE) 선택, INSERT 에러시 종료하지 않기 선택) --> 가져오기</p>
+  <h3>백업 복원 등 </h3>
+  <pre>
+    데이터베이스 DB, 계정정보
+    DB Name : test_db
+    테이블 : test_table
+    사용자 계정 : test_user
+    DB 접속계정 패스워드 : 123456
+
+    MYSQL DB 백업하기
+    1. 사용옵션
+    # mysqldump -u [사용자 계정] -p [패스워드] [원본 데이터베이스명] > [생성할 백업 DB명].sql
+    2. 사용방법
+    # mysqldump -u test_user -p test_db > backup_test_db.sql
+    passowrd : 123456
+
+    MYSQL DB 복원하기
+    1. 사용옵션
+    # mysql -u [사용자 계정] -p [패스워드] [복원할 DB] < [백업된 DB].sql
+    2. 사용방법
+    # mysql -u test_user -p test_db < backup_test_db.sql
+    password : 123456
+
+    MYSQL 테이블 백업하기
+    1. 사용옵션
+    # mysqldump -u [사용자 계정] -p [패스워드] [데이터베이스명] [원본 백업받을 테이블명] > [백업받을 테이블명].sql
+    2. 사용방법
+    # mysqldump -u test_user -p test_db test_table > backup_test_table.sql
+    password : 123456
+
+    MYSQL DB 테이블 복원하기
+    1. 사용옵션
+    # mysql -u [사용자 계정] -p [패스워드] [복원할 DB ] < [백업된 테이블].sql
+    2. 사용방법
+    # mysql -u test_user -p 123456 test_db < backup_test_table.sql
+    password : 123456
+
+    MYSQL 모든 데이터 베이스 백업하기
+    1. 사용옵션
+    # mysqldump --all-databases -u [사용자 계정] -p --default-character-set=euckr < [백업된 DB].sql
+    2. 사용방법
+    # mysqldump --all-databases -uroot -p --default-character-set=euckr > all.sql
+
+    MYSQL 모든데이터 베이스 복원하기
+    1. 사용옵션
+    mysql --all-databases -u [사용자 계정] -p < [백업된 DB].sql
+    2. 사용방법
+    # mysql -uroot -p < all.sql
+  </pre>
+
+  <h3> ALTER TABLE은 자주 사용하지 않아서...</h3>
+<pre>
+  컬럼 추가 (Add)
+  ALTER TABLE table_name ADD COLUMN ex_column varchar(32) NOT NULL;
+
+  컬럼 변경 (Modify)
+  ALTER TABLE table_name MODIFY COLUMN ex_column varchar(16) NULL;
+
+  컬럼 이름까지 변경 (Change)
+  ALTER TABLE table_name CHANGE COLUMN ex_column ex_column2 varchar(16) NULL;
+
+  컬럼 삭제 (Drop)
+  ALTER TABLE table_name DROP COLUMN ex_column;
+
+  테이블 이름 변경 (RENAME)
+  ALTER TABLE table_name1 RENAME table_name2;
+</pre>
+
+  <h3> SELET 문을 활용한 table JOIN, UPDATE, INSERT 등 예제</h3>
+    <p>left outer join : 왼쪽 모두, join되는 것은 맞는 것만</p>
+    <p>왼쪽에 topic table을 놓고 author table에서 맞는 값을 찾아서 오른 쪽에 놓음/casecade로 구성 가능</p>
+    <p>==> 조건에 맞는 값이 없어도 그냥 오른 쪽에 넣음</p>
+  <pre>
+    select * from topic t
+    left join author a
+    on t.author_id=a.aid
+    LEFT JOIN profile p   ==> 한번더 join
+    on a.profile_id=p.pid
+    where a.profile=1 ;  ==> 위 선택된 것 중 해당되는 것만 출력
+
+    SELECT gg._id, gg.name, s.title
+    FROM song AS s
+    LEFT OUTER JOIN  girl_group AS gg
+    ON s._id = gg.hit_song_id;
+  </pre>
+
+    <p>inner Join: 공통되는 내용만을 추출</p>
+  <p>왼쪽에 topic table을 놓고 author table에서 맞는 값을 찾아서 오른 쪽에 놓음(조건에 맞는 값이 없으면 행을 삭제함)</p>
+  <pre>
+    SELECT * FROM topic
+    INNER JOIN author
+    ON topic.author_id=author.profile_id;
+
+    SELECT gg._id, gg.name, s.title
+    FROM girl_group gg
+    JOIN song s
+    ON s._id = gg.hit_song_id;
+
+    테이블을 SELECT로 합처서 새로운 테이블 생성
+    CREATE TABLE jointable
+    SELECT * FROM memo m
+    LEFT OUTER JOIN song s
+    ON m.seq < s._id;
+
+    ID가 같으면 girl_group의 title 행을 song의 title로 채움
+    UPDATE girl_group, song
+    SET girl_group.title=song.title
+    WHERE girl_group.hit_song_id = song._id;
+
+    지정한 컬럼 다음에 해당 컬럼을 삽입
+    ALTER 테이블 ADD 컬럼이름 컬럼옵션(VAR(30)), ...  AFTER col_name;
+  </pre>
+
+  <h3>mysql workbench 연결 구성하기</h3>
+<pre>
+  ㅇ control + R 눌러서 연결 설정 창 띠움
+  ㅇ local 연결은
+     - managed connection ==>
+     - connection method : tcp/ip
+     - host 126.0.0.1 port 3306
+     - username root password db패스워드 입력
+
+  ㅇ 원격 연결(linux 서버)
+     - connection method : standard tcp/ip over ssh
+     - ssh hostname : IP:22
+     - ssh username : root(ssh 접속시 id)
+     - ssh password : ssh 접속시 패스워드
+     - MySQL hostname: 원격서버 IP(hostname과 동일)
+     - MySQL server port : 3306 (기본임)
+        ==> 연결되면 db 임포트 옵션 나옴.. 그대로 다 가져옴
+     - username : root
+       .. db에서 계정 추가 : create user root@'%' identified by '암호';
+         --> 암호는 복잡해야 먹음 : 간단한거는 애러남
+       ..                 grant privileges all on *.* to root@'%';
+          --> 그리고 서버 db 설정 파일 수정 필요
+       .. /etc/mysql/mariadb.conf.d/50-server.cnf ==> binding된 것을 죽임 커맨트 처리
+       .. db서버 재시작
+</pre>
+</div>
+</div>
+
+
+
+
+</body>
+</html>

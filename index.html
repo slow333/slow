@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HOME</title>
+  <script src="fixhead.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<body>
+<div id="nav-placeholder"> </div>
+<script>
+  $(function(){
+    $("#nav-placeholder").load("nav.html");
+  });
+</script>
+<div style="padding-top: 100px"><br></div>
+<div class="container">
+  <div class="box">
+    <h2>앞으로 할일</h2>
+    <ul style="font-size: 20px;padding: 20px">
+      <li>Front end : web 관련 html, css, JavaScript, php</li>
+      <li>현재 PHP로 홈페이지 제작중(PHP, MySql)</li>
+      <li>Back end : Java, JSP</li>
+      <li>Web App, Android App(Kotlin) 개발</li>
+    </ul>
+    <h2>홈페이지 만든 정보</h2>
+    <span style="font-size: 20px;padding: 20px">
+    <p>IDE : Intellij IDE 22.2.3</p>
+    <p>PHP 정보 : <a href="info.php">phpinfo</a></p>
+    <p>adminphp : root /111111</p>
+    <p><a href="https://slow333.github.io/k/">gitHub Home</a> </p>
+    <p>bitnami에서 wampstack-7.4.33-0을 다운받아서 php(PHP Version 7.4.33) 설치</p>
+    <p>apache2(Server version: Apache/2.4.54 (Win64))</p>
+    <p> mariadb(10.4.27-MariaDB) 생성 </p>
+    </span>
+  </div>
+</div>
+
+
+<script> fixheader() </script>
+</body>
+</html>

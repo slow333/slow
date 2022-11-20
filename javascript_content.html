@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript</title>
+  <script src="fixhead.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<body>
+<div id="nav-placeholder"> </div>
+<script>
+  $(function(){
+    $("#nav-placeholder").load("nav.html");
+  });
+</script>
+<h1 style="padding-top: 130px;padding-left: 40px">JavaScript //
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference" style="font-size: 0.6em">Mozilla(MDN)) ||</a>
+  <a href="https://opentutorials.org/course/50" style="font-size: 0.6em"> 생활코팅 용어집 || </a>
+  <a href="https://opentutorials.org/course/743/6533" style="font-size: 0.6em">JS API ||</a>
+  <a href="https://ko.javascript.info/" style="font-size: 0.65em"> 강의 책 ||</a>
+  <a href="https://nodejs.org/dist/latest-v18.x/docs/api/documentation.html" style="font-size: 0.6em">nodejs API 문서</a>
+</h1>
+<div class="container">
+  <div class="box">
+<h2  style="padding-top: 6px">Javascript 개요</h2>
+  <p>
+    자바스크립트(영어: JavaScript)는 객체 기반의 스크립트 프로그래밍 언어이다. 이 언어는 웹 브라우저 내에서 주로 사용되며, 다른 응용 프로그램의 내장 객체에도 접근할 수 있는 기능을 가지고 있다. 또한 Node.js와 같은 런타임 환경과 같이 서버 프로그래밍에도 사용되고 있다. 자바스크립트는 본래 넷스케이프 커뮤니케이션즈 코퍼레이션의 브렌던 아이크(Brendan Eich)가 처음에는 모카(Mocha)라는 이름으로, 나중에는 라이브스크립트(LiveScript)라는 이름으로 개발하였으며, 최종적으로 자바스크립트가 되었다. 자바스크립트가 썬 마이크로시스템즈의 자바와 구문이 유사한 점도 있지만, 이는 사실 두 언어 모두 C 언어의 기본 구문에 바탕을 뒀기 때문이고, 자바와 자바스크립트는 직접적인 연관성은 약하다. 이름과 구문 외에는 자바보다 셀프나 스킴과 유사성이 많다.
+    자바스크립트는 ECMA스크립트(ECMAScript)의 표준 사양을 가장 잘 구현한 언어로 인정받고 있으며 ECMAScript 5(ES5)까지는 대부분의 브라우저에서 기본적으로 지원되었으나 ECMAScript 6 이후부터는 브라우저 호환성을 위해 트랜스파일러로 컴파일된다.
+  </p>
+  <p>
+    "자바스크립트"(JavaScript)는 이제 오라클의 상표이다. 하지만 오라클은 자바스크립트에
+    일절 관여하지 않는다. 넷스케이프 커뮤니케이션스가 발명, 구현한 기술 및 모질라 재단과 같은
+    독립 기관의 라이선스 하에 사용된다.
+  </p>
+  <p>
+    아래는 자바스크립트와 HTML5로 이루어진 헬로 월드 프로그램이며, 실선 내부가 자바스크립트의 부분이다.
+  </p>
+
+    <pre>
+      &lt;!DOCTYPE HTML&gt;
+      &lt;html>
+      &lt;head>
+        &lt;meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+        &lt;title>자바스크립트 페이지&lt;/title>
+      &lt;script type="text/javascript">
+      &nbsp;document.write("&lt;p>Hello World!&lt;/p>");
+      &lt;/script>
+      &lt;/head>
+      &lt;body>
+      &lt;noscript>
+      &lt;p>브라우저가 자바스크립트 기능을 지원하지 않거나 자바스크립트 기능이 꺼져 있습니다.&lt/p>
+      &lt;/noscript>
+      &lt;/body>
+      &lt;/html>
+
+      헬로 월드 콘솔에 출력 ==> &nbsp;console.log("Hello world!");
+      헬로 월드 경고창 ==>     &nbsp;alert("Hello world!")
+      단순 문법
+      &nbsp;자바스크립트의 변수는 var, let, const 키워드를 사용하여 정의할 수 있다.
+      &nbsp;// Declares a function-scoped variable named `x`, and implicitly assigns the
+      &nbsp;// special value `undefined` to it.
+      &nbsp;var x;
+      &nbsp;// More explicit version of the above.
+      &nbsp;var x2 = undefined;
+      &nbsp;// Declares a block-scoped variable named `y`, and implicitly sets it to
+      &nbsp;// `undefined`. The `let` keyword was introduced in ECMAScript 2015.
+      &nbsp;let y;
+      &nbsp;// More explicit version of the above.
+      &nbsp;let y2 = undefined;
+      &nbsp;// Declares a block-scoped, un-reassign-able variable named `z`, and sets it to
+      &nbsp;// `undefined`. The `const` keyword was also introduced in ECMAScript 2015, and
+      &nbsp;// must be explicitly assigned to.
+      &nbsp;const z = undefined;
+      /&nbsp;/ Declares a variable named `myNumber`, and assigns a number literal (the value `2`) to it.
+      &nbsp;let myNumber = 2;
+      &nbsp;// Reassigns `myNumber`, setting it to a string literal (the value `"foo"`).
+      &nbsp;// JavaScript is a dynamically-typed language, so this is legal.
+      &nbsp;myNumber = "foo";
+    </pre>
+<h3>sample Code</h3>
+  <pre>
+    function a(){} ==> a = function{} ;  a = { b: function(){} )
+    &lt;script type="text/javascript">
+      let grade = {'me': 1, 'you' : "good", 'out': "no"};
+      for (let key in grade){
+        document.write("&lt;li>"+key +": "+ grade[key]+"&lt;/li>");
+      }
+
+      let grades = {
+        'list': {'student1': 40, 'student2': 60, 'student3': 88, 'student4':90},
+        'show': function () {
+          for (let i in this.list) {
+            document.write("key : " + i + ", value: " + this.list[i] + "&lt;br>");
+          }
+        }
+      };
+      grades.show();
+    &lt;/script>
+  </pre>
+<h3> javascript regular expression(정규 표현식)</h3>
+  <pre>
+    RegExp.exec()
+    let pattern = /a/;  또는 let pattern = new RegExp('a');
+    let pattern = /a/i; => 대소문자 구분 안함;
+    /a/g; => 모두 찾음 ; /a/ig => 대소문자 구분없이 모두 찾음
+    var xi = /a/i;
+    "ABCsodi".match(xi);
+    (\w+) ==> 문자 가 1개 이상 , \s ==> space, (\d*) ==> 숫자 0도 포함
+    const myArray = /d(b+)d/g.exec('cdbbdbsbz');
+    // similar to 'cdbbdbsbz'.match(/d(b+)d/g); however,
+    // 'cdbbdbsbz'.match(/d(b+)d/g) outputs [ "dbbd" ]
+    // while /d(b+)d/g.exec('cdbbdbsbz') outputs [ 'dbbd', 'bb', index: 1, input: 'cdbbdbsbz' ]
+    let pattern1 = /(\w+)\s(\w+)/;
+    let str = "coding for me";
+    let result = str.replace(patter1, '$2, $1'); ==> 2번째 찾은 것을 먼저( ','는 문자로 출력)
+    let result = str.match(patter1); ==> true, false로 리턴
+  </pre>
+<h3>url 찾아서 a tag로 감싸는 것</h3>
+<pre>
+  var urlPattern = /\b(?:https?):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*/gim;
+  var content = '생활코딩 : http://opentutorials.org/course/1 입니다. 네이버 : http://naver.com 입니다. ';
+  var result = content.replace(urlPattern, function(url){
+  return '&lt;a href="'+url+'">'+url+'&lt;/a>';
+  });
+  console.log(result);
+</pre>
+<pre>
+ 거듭 제곱 : 2**3 / parseInt('3월') -0 => 3 / 'A'.charCodeAt()
+ === 값과 자료형을 비교
+ !== / !!'a' == boolean('a')
+ false ==> '', 0, NaN, undefined, null, false
+ false == 0, true == 1
+ for (let i = 5; i > 0; i--){ console.log('*'.repeat(i)); }
+  let list = [1,2,3,4,5];
+      list.unshift('0') => 맨앞에 추가, list.push(6) => 맨뒤 추가
+  let list = [1,2,3,4,5];
+      list.shift() => 맨앞 제거,        list.pop() => 맨뒤 제거
+  list.slice(2, 3); 2번 index 부터 3개 지움
+  list.includes('abc');  ==> true, false
+  list.indexOf('a');  ==> 위치를 알려줌
+  list.lastIndexOf('a');  ==> 뒤에서 부터 찾음
+  list.slice(2, 5); ==> 시작위치 부터 5앞 까지 뽑아냄
+  list.splice(2, 0); ==> 2서부터 0개를 제거
+</pre>
+<p>창 선택하기</p>
+<pre>
+    &lt;div>&lt;span id="order">1&lt;/span> 번째 참가자&lt;/div>
+      &lt;div>제시어 : &lt;span id="word">&lt;/span>&lt;/div>
+      &lt;input type="text" style="font-size: 40px;width: 300px">
+    &lt;button class="btn target" style="font-size: 32px"> 입력1 &lt;/button>
+      &lt;button class='btn' style="font-size: 32px"> 입력2 &lt;/button>
+      &lt;button class='target' style="font-size: 32px"> 입력3 &lt;/button>
+    &lt;script>
+      // const number = parseInt(prompt('몇명이 참가?', 10));
+      // alert('number');
+      // const isOk = confirm('맞나요');
+      document.querySelector('span#order') // span tag의 id 값 #
+      document.querySelector('button.btn') // '.' button tag의 class ; 1번째 2번째
+      document.querySelector('div span') // div에 속해는 span ; 밑에 것 다 찾음
+      document.querySelector('div>span') // div에 속해는 span ; 밑에 것만 찾음
+    &lt;/script>
+</pre>
+<h2> JQuery는 javaScript 가장 많이 사용하는 것. 사용 방법은</h2>
+<p>
+    <ul style="font-size: 22px;padding-left: 30px">
+      <li><a href="jquery.com">jquery.com</a> </li>
+      <li><a href="https://jquery.com/download/">download</a> </li>
+      <li><a href="https://developers.google.com/speed/libraries/devguide#jquery">
+        Google CDN(jQury연결)</a> </li>
+    </ul>
+  </p>
+  <p>
+    jQuery 3.x 스니펫: 아래 내용을 copy 해서 &lt;head>에 아래 내용을 붙여 넣음<br>
+    &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js">&lt;/script>
+  </p>
+
+</div>
+</div>
+
+
+<script> fixheader() </script>
+</body>
+</html>
