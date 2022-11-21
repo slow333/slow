@@ -15,7 +15,7 @@ header{
   top:0; left: 0; right: 0;
   background: black;
   box-shadow: 0 2px 4px rgba(0,0,0,10%);
-  padding: 24px 8px;
+  padding: 18px 2px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,7 +37,7 @@ header .navbar ul li{
 }
 header .navbar ul li a{
   font-size: 20px;
-  padding: 20px;
+  padding: 12px;
   color: white;
   display: block;
 }
