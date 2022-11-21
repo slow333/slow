@@ -103,7 +103,7 @@ header label{
   display: none;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 500px) {
 
   header{
     padding:10px;
